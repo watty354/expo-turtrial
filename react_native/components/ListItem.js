@@ -1,18 +1,29 @@
 import { StyleSheet, Image, View, Text } from 'react-native';
 
-export const ListItem = () => {
+/**
+ * 
+ * @param {
+ * imageUrl: 画像URL(strimg)
+ * title: タイトル(strimg)
+ * author: ニュース提供元(strimg)
+ * 
+ * } props 
+ * @returns 
+ */
+
+export const ListItem = (props) => {
     return (
         <View style={styles.itemContainer}>
           <View style={styles.leftContainer}>
             <Image
               style={{ with: 100, height: 100 }}
-              source={{ url: "https://picsum.photos/id/10/300/300" }}
+              source={{ url: props.imageUrl}}
             />
           </View>
           <View style={styles.rightContainer}>
             <Text numberOfLines={3} style={styles.text}>
-              学習は日々の積み重ねが大切です。調査によるとvfdsfsbfdsbfdsd</Text>
-            <Text style={styles.subText}>ReactNews</Text>
+              {props.title}</Text>
+            <Text style={styles.subText}>{props.author}</Text>
           </View>
       </View>
     );
