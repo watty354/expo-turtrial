@@ -1,72 +1,58 @@
-import { useState, useEffect } from "react";
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, FlatList, SafeAreaView, ScrollView } from 'react-native';
-import { ListItem } from "./components/ListItem";
-import axios from "axios";
-import Constants  from "expo-constants";
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { HomeScreen } from './screens/HomeScreen';
+import { ArticleScreen } from './screens/ArticleScreen';
+import { ClipScreen } from './screens/ClipScreen';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+// import { FrontAwesome } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { store } from './store'
+import { Provider } from 'react-redux'
+import { Text } from 'react-native';
 
-const URL = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=${Constants.manifest.extra.newsApiKey}`;
+const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+const screenOption = ({ route }) => ({
+  tabBarIcon: ({color, size }) => {
+    let iconName;
 
-export default function App() {
-  // console.log(Constants.manifest.extra.newsApiKey);
-  const [articles, setArticles] = useState([]);
-
-  const fetchArticles = async ()  => {
-    try{
-      const response = await axios.get(URL);
-      // console.log(response);
-      setArticles(response.data.articles);
-    }catch(e){
-      console.log(e);
+    if (route.name === 'HomeTab') {
+      return <Ionicons name="home" size={size} color={color}/>
+    } else if (route.name === 'ClipTab') {
+      return <Ionicons name="bookmark" size={size} color={color}/>
     }
-  }
+  },
+})
 
-  //初期化時に一度だけ実行される関数
-  useEffect(() => {
-    fetchArticles()
-  }, [])
+const HomeStack = () => {
   return (
-    <SafeAreaView style={styles.container}>
-      <FlatList
-        data={articles}
-        renderItem={({ item }) => (
-          <ListItem
-            imageUrl={item.urlToImage}
-            title={item.title}
-            author={item.author}
-          />
-        )}
-        keyExtractor={(item, index) => index.toString()}
-      />
-      <StatusBar style="auto" />
-    </SafeAreaView>
+    <Stack.Navigator>
+      <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Article" component={ArticleScreen} />
+    </Stack.Navigator>
+  );
+}
+const ClipStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Clpe" component={ClipScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Article" component={ArticleScreen} />
+    </Stack.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  itemContainer: {
-    height: 100,
-    width: "100%",
-    flexDirection: "row",
-  },
-  leftContainer: {
-    width: 100,
-  },
-  rightContainer: {
-    flex: 1,
-    padding: 10,
-    justifyContent: 'space-between',
-  },
-  text: {
-    fontSize: 16,
-  },
-  subText: {
-    fontSize: 12,
-    color: "gray",
-  }
+export default function App() {
+  return (
+    <Provider store={store}>
 
-});
+    <NavigationContainer>
+      <Tab.Navigator screenOptions={screenOption}>
+        <Tab.Screen name="HomeTab" component={HomeStack} options={{ headerShown: false,title: "Home" }}/>
+        <Tab.Screen name="ClipTab" component={ClipStack} options={{ headerShown: false,title: "Clip" }}/>
+      </Tab.Navigator>
+    </NavigationContainer>
+    </Provider>
+    
+  );
+}
+
